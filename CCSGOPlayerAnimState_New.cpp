@@ -2097,30 +2097,23 @@ void CCSGOPlayerAnimState::SetupVelocity()
 
 	if (m_flSpeed > 0.1f || fabs(m_flAbsVelocityZ) > 100.0f)
 	{
-		m_flGoalFeetYaw = ApproachAngle(
-			m_flEyeYaw,
-			m_flGoalFeetYaw,
-			((m_flGroundFraction * 20.0f) + 30.0f)
-			* m_flLastClientSideAnimationUpdateTimeDelta);
+		m_flGoalFeetYaw = m_flEyeYaw; // m_flEyeYaw = player->cmd->viewangles.y on update animations (server -> every tick, client -> every frame)
 
-		m_flNextLowerBodyYawUpdateTime = /*Interfaces::Globals->curtime*/ m_flCurTime + 0.22f;
+		m_flNextLowerBodyYawUpdateTime = Interfaces::Globals->curtime + 0.22f;
 
 		if (pBaseEntity->GetLowerBodyYaw() != m_flEyeYaw)
 			pBaseEntity->SetLowerBodyYaw(m_flEyeYaw);
 	}
 	else
 	{
-		m_flGoalFeetYaw = ApproachAngle(
-			pBaseEntity->GetLowerBodyYaw(),
-			m_flGoalFeetYaw,
-			m_flLastClientSideAnimationUpdateTimeDelta * 100.0f);
+		m_flGoalFeetYaw = GetLowerBodyYaw;
 
-		if (/*Interfaces::Globals->curtime*/ m_flCurTime > m_flNextLowerBodyYawUpdateTime)
+		if (Interfaces::Globals->curtime > m_flNextLowerBodyYawUpdateTime)
 		{
 			float dt = AngleDiff(m_flGoalFeetYaw, m_flEyeYaw);
 			if (fabsf(dt) > 35.0f)
 			{
-				m_flNextLowerBodyYawUpdateTime = /*Interfaces::Globals->curtime*/ m_flCurTime + 1.1f;
+				m_flNextLowerBodyYawUpdateTime = Interfaces::Globals->curtime + 1.1f;
 				if (pBaseEntity->GetLowerBodyYaw() != m_flEyeYaw)
 					pBaseEntity->SetLowerBodyYaw(m_flEyeYaw);
 			}
